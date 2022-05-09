@@ -12,7 +12,7 @@ export class OrderDetails {
     @Column()
     quantity:number
 
-    @OneToOne(() => Book )
+    @ManyToOne(() => Book )
     @JoinColumn()
     book_id:Book[]
 
