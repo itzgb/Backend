@@ -80,7 +80,10 @@ class AuthController {
     let user: User;
     
     try {
-      user = await userRepository.findOneOrFail({ where: { email:email } });
+      user = await userRepository.findOne({ 
+        where: { email:email },
+        relations:["userrole"]
+      });
     } catch (error) {
       res.status(401).send();
     }
@@ -99,9 +102,15 @@ class AuthController {
       config.jwtSecret,
       
     );
-
+      let userdata = {
+        username : user.username,
+        role: user.userrole.role
+      }
     //Send the jwt in the response
-    res.send(token);
+    res.send(
+      { token:token,
+        user: userdata
+      });
   };
 
   

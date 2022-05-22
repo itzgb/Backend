@@ -6,6 +6,7 @@ import { BookGenre } from "./entity/BookGenre"
 import { Cart } from "./entity/Cart"
 import { Order } from "./entity/Order"
 import { OrderDetails } from "./entity/OrderDetails"
+import { Review } from "./entity/Review"
 import { User } from "./entity/User"
 import {UserRoles} from "./entity/UserRoles"
 export const AppDataSource = new DataSource({
@@ -17,7 +18,7 @@ export const AppDataSource = new DataSource({
     database: "nodedb",
     synchronize: true,
     logging: false,
-    entities: [User , UserRoles , Book , BookGenre , Cart , Order , Address ,OrderDetails],
+    entities: [User , UserRoles , Book , BookGenre , Cart , Order , Address ,OrderDetails , Review],
     migrations: ["src/migration/*.ts"],
     
 })

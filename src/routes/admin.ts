@@ -14,6 +14,12 @@ router.get("/getUsers" ,checkJwt ,checkRole([Userroles.ADMIN]) , AdminController
 router.get("/getOrders" ,checkJwt ,checkRole([Userroles.ADMIN]) , AdminController.getOrders);
 router.get("/getGenres" ,checkJwt ,checkRole([Userroles.ADMIN]) , BookGenreController.getAll);
 
+
+router.get("/delBook/:id" ,checkJwt ,checkRole([Userroles.ADMIN]) , AdminController.delBook);
+router.get("/delUser/:id" ,checkJwt ,checkRole([Userroles.ADMIN]) , AdminController.delUser);
+router.get("/delOrder/:id" ,checkJwt ,checkRole([Userroles.ADMIN]) , AdminController.delGenre);
+router.get("/delGenre/:id" ,checkJwt ,checkRole([Userroles.ADMIN]) , AdminController.delOrder);
+
 //create book
 
 //deletebook

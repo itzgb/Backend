@@ -17,6 +17,7 @@
       "body-parser": "^1.19.1",
       "class-validators": "^1.0.1",
       "cors": "^2.8.5",
+      "dotenv": "^16.0.1",
       "express": "^4.17.2",
       "express-session": "^1.17.2",
       "express-validator": "^6.14.0",

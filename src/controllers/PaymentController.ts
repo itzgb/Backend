@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getRepository } from "typeorm";
+import { getRepository, UsingJoinTableOnlyOnOneSideAllowedError } from "typeorm";
 import { validate } from "class-validator";
 import { User } from "../entity/User";
 import {Userroles} from '../config/config';
@@ -20,6 +20,26 @@ export default class PaymentController{
     static pay = async(req:Request , res: Response) =>{
         
         console.log(req.body.cartItems,res.locals.jwtPayload.userId);
+        let coupon_id;
+        try{
+          const coupon = await stripe.coupons.create({percent_off: 20, duration: 'once' , currency: 'inr'})
+          coupon_id=coupon.id
+        }catch(err){
+          console.log(err)
+        }
+        
+
+        console.log("coupon ",coupon_id)
+        try{
+
+          const promotionCode = await stripe.promotionCodes.create({
+            coupon: coupon_id,
+            code: 'VIPCODE',
+          });
+        }catch(err){
+          console.log("Prormo code",err);
+        }
+
         const customer = await stripe.customers.create({
           metadata:{
             userId : res.locals.jwtPayload.userId,
@@ -90,7 +110,7 @@ export default class PaymentController{
               enabled: true,
             },
             mode: 'payment',
-            
+            allow_promotion_codes: true,
             success_url: 'http://localhost:3000/payment/success',
             cancel_url: 'http://localhost:3000/cancel',
           });

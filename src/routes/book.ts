@@ -10,9 +10,14 @@ const router = Router();
 router.get("/getAll",BookController.getAll);
 
 //get Book by id
+router.get("/getnewbooks",BookController.getRecentlyAddedBook);
 router.get("/:id",BookController.getBook);
+
 //create book
-router.post("/add",checkJwt, checkRole([Userroles.SELLER ]) , BookController.add)
+router.post("/add",checkJwt, checkRole([Userroles.SELLER ]) , BookController.add);
+router.get("/delete/:id",checkJwt, checkRole([Userroles.SELLER ]) , BookController.delete);
+
+router.post("/addreview",checkJwt , BookController.addReview); 
 
 
 //deletebook

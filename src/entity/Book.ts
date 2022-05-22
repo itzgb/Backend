@@ -1,10 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column , Unique, CreateDateColumn , UpdateDateColumn, JoinColumn, OneToOne , ManyToOne, ManyToMany} from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column , Unique, CreateDateColumn , UpdateDateColumn, JoinColumn, OneToOne , ManyToOne, ManyToMany, OneToMany} from "typeorm"
 import { Length, IsNotEmpty , IsEmail} from "class-validator";
 import * as bcrypt from "bcryptjs";
 import { UserRoles } from "./UserRoles";
 import { User } from "./User";
 import {BookGenre} from './BookGenre';
 import { OrderDetails } from "./OrderDetails";
+import { Review } from "./Review";
 
 @Entity()
 export class Book {
@@ -41,5 +42,11 @@ export class Book {
 
     @ManyToOne(()=>BookGenre)
     genre: BookGenre
+
+    @OneToMany(()=>Review , (reviews) => reviews.book ,{
+        eager:true
+    })
+    @JoinColumn()
+    reviews: Review
     
 }

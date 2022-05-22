@@ -16,6 +16,7 @@ import adminRouter from './routes/admin'
 import * as path from 'path';
 import paymentController from '../src/controllers/PaymentController'
 const multer = require('multer');
+require('dotenv').config();
 // create express app
 const app = express()
 
@@ -56,4 +57,4 @@ AppDataSource.initialize().then(async () => {
 }).catch(error => console.log(error))
 
 
-app.listen(3100 , ()=>console.log("lisenting on port 3000"))
+app.listen(process.env.PORT || 3100 , ()=>console.log("lisenting on port on 3100" , process.env.PORT))

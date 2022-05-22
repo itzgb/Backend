@@ -8,6 +8,7 @@ import config, { Userroles } from "../config/config";
 import { UserRoles } from "../entity/UserRoles";
 import { User } from "../entity/User";
 import { BookGenre } from "../entity/BookGenre";
+import { Review } from "../entity/Review";
 
 
 
@@ -41,6 +42,22 @@ export default class BookController {
       });
       res.send(data);
     }
+    static getRecentlyAddedBook = async(req : Request , res: Response) =>{
+      console.log("this log");
+      const BookRepository = AppDataSource.getRepository(Book);
+      const data = await BookRepository.find({
+        relations:["genre","user"],
+        order:{
+          createdAt:"DESC"
+        }
+      }).then(d=>{
+        res.send(d);
+
+      }).catch(err=>console.log(err));
+    }
+
+    
+     
     static add = async (req : Request , res: Response) => {
         
         let { title , price , desc  ,genre } = req.body;
@@ -88,4 +105,35 @@ export default class BookController {
       
       
     };
+
+    static delete = async(req :Request , res:Response) =>{
+      const id = req.params.id;
+      const BookReposiory = AppDataSource.getRepository(Book);
+      const book = await BookReposiory.findOne({where:{id:id}});
+      const resp = await BookReposiory.remove(book);
+      console.log(resp);
+      res.send("book deleted Succesfully")
+  }
+
+  static addReview = async(req :Request , res:Response) =>{
+    const id = res.locals.jwtPayload.userId;  
+    console.log("review ",req.body);
+    const {  rating , comment } = req.body;
+    const book_id = parseInt(req.body.id);    
+    const UserRepository = AppDataSource.getRepository(User);
+    const ReviewRepository = AppDataSource.getRepository(Review);
+    const BookRepository = AppDataSource.getRepository(Book);
+    const user:User = await UserRepository.findOne({where:{id:id}});
+    const book = await BookRepository.findOne({where:{id:book_id}});
+    let data = new Review();
+    data.book = book;
+    data.user = user.username;
+    data.rating = rating;
+    data.comment = comment;
+    const resp = await ReviewRepository.save(data);
+    console.log(resp);
+    res.send("Review Added Succesfully");
+  }
+
+  
 }  

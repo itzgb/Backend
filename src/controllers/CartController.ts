@@ -23,7 +23,8 @@ export default class BookController {
         res.send(user); 
     }
     static add = async(req :Request , res:Response) =>{
-        const book_id = req.params.id;
+        const book_id = req.body.id;
+        const quantity = req.body.quantity;
         const user_id = res.locals.jwtPayload.userId;
         console.log(book_id,user_id);
         const CartReposiory = AppDataSource.getRepository(Cart);
@@ -32,8 +33,34 @@ export default class BookController {
         const users = await UserReposiory.findOne({where:{id:user_id}});
         const book = await BookReposiory.findOne({where:{id:book_id}});
         try{
-            const resp = await CartReposiory.save({user_id:users , book_id:book , total: 10 , quantity : 1 });
-            console.log("cartsp" , resp);
+            const cartbook =  await UserReposiory.findOne({
+                where:{
+                    id:user_id,
+                    cart_books:{
+                        book_id:{
+                            id:book_id
+                        }
+                    }
+                },
+                relations :["cart_books","cart_books.book_id"]
+            });
+            const cart_book =  await CartReposiory.findOne({
+                where:{
+                    user_id:user_id,
+                    book_id:{
+                        id:book_id
+                        }
+                    }
+                
+            });
+            if(cart_book!=null){
+                console.log("Already book exist in cart " , cart_book)
+                cart_book.quantity = cart_book.quantity + 1;
+                await CartReposiory.save(cart_book);
+            }else{
+                const resp = await CartReposiory.save({user_id:users , book_id:book , total: 10 , quantity : quantity });
+                console.log("cartsp" , resp);
+            }
         } 
         catch (e) {
             console.log("err",e);
