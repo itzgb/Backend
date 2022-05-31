@@ -1,24 +1,16 @@
 import { Request, Response } from "express";
-import { getRepository, UsingJoinTableOnlyOnOneSideAllowedError } from "typeorm";
-import { validate } from "class-validator";
-import { User } from "../entity/User";
-import {Userroles} from '../config/config';
 import { AppDataSource } from "../data-source";
-import { UserRoles } from "../entity/UserRoles";
-import { Book } from "../entity/Book";
+
+import { User } from "../entity/User";
 import { Order } from "../entity/Order";
-import { Address } from "../entity/Address";
-//import stripe from "stripe";
-
-
-import{public_key } from '../config/config';
+require('dotenv').config();
 const Stripe = require("stripe");
-const stripe = Stripe('sk_test_51Kvff6SDt228OUuvgarp9wnAKC3o8puliO3LkG3WvgVdIkUdrIrOKM5lOMhSNmiMlhDG2sfRH7b0s1vLMimqQKdM00k30WgzTu');
-const endpointSecret = 'whsec_d2711b47ce5d023c0e91de709f6d9accbc6087367334536ee946260b4a5f42a2';
+const stripe = Stripe(process.env.STRIPE_SECRET_KEY );
+const endpointSecret = process.env.STRIPE_SIGN_KEY;
 export default class PaymentController{
 
     static pay = async(req:Request , res: Response) =>{
-        
+        console.log("public key" , process.env.STRIPE_PUBLIC_KEY )
         console.log(req.body.cartItems,res.locals.jwtPayload.userId);
         let coupon_id;
         try{
@@ -65,18 +57,6 @@ export default class PaymentController{
           });
 
         const session = await stripe.checkout.sessions.create({
-            /*line_items: [
-              {
-                price_data: {
-                  currency: 'usd',
-                  product_data: {
-                    name: 'T-shirt',
-                  },
-                  unit_amount: 2000,
-                },
-                quantity: 1,
-              },
-            ]*/
             payment_method_types: ["card"],
                 shipping_address_collection: {
                     allowed_countries: ["IN"],
@@ -112,7 +92,7 @@ export default class PaymentController{
             mode: 'payment',
             allow_promotion_codes: true,
             success_url: 'http://localhost:3000/payment/success',
-            cancel_url: 'http://localhost:3000/cancel',
+            cancel_url: 'http://localhost:3000/payment/cancel',
           });
         
           res.send({url: session.url});
@@ -126,17 +106,15 @@ export default class PaymentController{
         const UserRespository = AppDataSource.getRepository(User);
         const userdata = await UserRespository.findOne({
           where:{id:userId},
-          relations:["cart_books"]
+          relations:["cart_books","cart_books.book_id"]
         })
           .then(result=>{
-            console.log(result);
+            console.log("carted" ,result);
             cartItems = result.cart_books;
           })
           .catch(err=>console.log(err))
-        const total = datas.total_amount;
+        const total = datas.total_amount / 100;
         const delivery_number = datas.cust_details.phone; 
-        //const bookId = cart.book_id;
-        //const userId = user.id;
         const address:any =    {
            city: datas.cust_details.address.city,
           country : datas.cust_details.address.country,
@@ -144,19 +122,19 @@ export default class PaymentController{
           line2 : datas.cust_details.address.line2,
           postal_code:datas.cust_details.address.postal_code,
           state:datas.cust_details.address.state,
-          total:2
         }; 
         
         const OrderRespository = AppDataSource.getRepository(Order);
         
-        cartItems[0].subtotal = 5;
         let orderDetails:any = []
         try{
 
           cartItems.map((item)=>{
-            const book_id=item.id;
+            console.log("itemm",item);
+            const book_id=item.book_id.id;
             const quantity=item.quantity;
-            const subtotal= (item.quantity) * (item.price) || 5;
+            const subtotal=  parseInt(item.quantity) * parseInt(item.book_id.price) ;
+            console.log("subtotal price quan" , subtotal , item.price);
             orderDetails.push({book_id,quantity,subtotal});
           })
         }catch(err){console.log(err)}

@@ -2,9 +2,8 @@
 
 apis
 
-##public routes
-
-    -login/signup
+## public routes
+    - login/signup
         -/login
         -/signup
         -/admin/login
@@ -17,8 +16,8 @@ apis
     -book
         -/book/:id                  get book by id
     
-    -cart
-        -/cart/add/:id              add to cart a book
+    - cart
+        - /cart/add/:id              add to cart a book
         -/cart/edit/:id             edit book in cart
         -/cart/delete/:id           delete cart book
         -/cart/view                 list all cart items

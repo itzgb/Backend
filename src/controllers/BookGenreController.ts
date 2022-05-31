@@ -1,36 +1,25 @@
 import { Request, Response } from "express";
-import * as jwt from "jsonwebtoken";
-import { getRepository } from "typeorm";
 import { validate } from "class-validator";
 import { AppDataSource } from "../data-source";
 import { BookGenre } from "../entity/BookGenre";
-import config, { Userroles } from "../config/config";
-import { UserRoles } from "../entity/UserRoles";
 import { Book } from "../entity/Book";
+import { getAllGenreData, getGenreData } from "../services/genreServices";
 
 
 
 export default class BookGenreController {
     static getGenres = async (req: Request, res: Response) => {
-      
       const take = req.query.limit;
       const skip = req.query.page * take;
       console.log(take,skip)
-        const BookGenreRepository = AppDataSource.getRepository(BookGenre);
-        const genreData = await BookGenreRepository.findAndCount({
-          take,
-          skip
-        }).then(d=>{
+        await getGenreData(take ,skip).then(d=>{
           console.log(d)
           res.send(d);
         }).catch(err=>console.log(err));
     };
 
     static getAll = async (req: Request, res: Response) => {
-      
-      
-        const BookGenreRepository = AppDataSource.getRepository(BookGenre);
-        const genreData = await BookGenreRepository.find().then(d=>{
+        const genreData = await getAllGenreData().then(d=>{
           console.log(d)
           res.send(d);
         }).catch(err=>console.log(err));
